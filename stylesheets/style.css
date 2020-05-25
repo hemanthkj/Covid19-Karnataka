@@ -1,0 +1,210 @@
+#body{
+ font-family: sans-serif;
+ letter-spacing: .02em;
+ margin: 20px;
+}
+
+#app-title{
+    font-size: 30px;
+    font-weight: 700;
+    margin: 10px 0 30px 0;
+    text-align: center;
+}
+
+#state-name{
+    font-size: 25px;
+    font-weight: 700;
+    margin: 10px 0 10px 0;
+}
+
+#total-numbers-info{
+    width: 100%;
+    display: block;
+    margin: 0 auto 20px auto;
+}
+
+#confirmed, #active, #recovered, #deceased{
+    display: inline-block;
+    width: calc(25% - 61px);
+    border-radius: 5px;
+    padding: 20px;
+}
+
+#confirmed{
+    color: #ff073a;
+    border: 1px solid #ff073a;
+    margin-right: 10px;
+}
+
+#active {
+    color: #007bff;
+    border: 1px solid #007bff;
+}
+
+#recovered{
+    color: #28a745;
+    border: 1px solid #28a745;
+
+}
+
+#active, #recovered{
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#deceased{
+    color: #6c757d;
+    margin-left: 10px;
+    border: 1px solid #6c757d;
+}
+
+#confirmed .header, #active .header, #recovered .header, #deceased .header{
+    margin-bottom: 10px;
+}
+
+#confirmed .header .title, #active .header .title, #recovered .header .title, #deceased .header .title{
+    font-size: 16px;
+    font-weight: 700;
+}
+
+#confirmed .header .perc, #active .header .perc, #recovered .header .perc, #deceased .header .perc{
+    font-size: 14px;
+    font-weight: 700;
+    float: right;
+    display: initial;
+}
+
+#confirmed .content .perc2, #active .content .perc2, #recovered .content .perc2, #deceased .content .perc2{
+    font-size: 13px;
+    font-weight: 700;
+    display: none;
+}
+
+#confirmed .content .t_count, #active .content .t_count, #recovered .content .t_count, #deceased .content .t_count{
+    font-size: 22px;
+    font-weight: 700;
+    vertical-align: middle;
+}
+
+#confirmed .content .i_count, #active .content .i_count, #recovered .content .i_count, #deceased .content .i_count{
+    font-size: 14px;
+    font-weight: 700;
+}
+
+@media (max-width: 900px){
+    #confirmed, #active, #recovered, #deceased{
+        width: calc(25% - 41px + (15px/2));
+        padding: 10px;
+    }
+
+    #confirmed{
+        margin-right: 5px;
+    }
+    
+    #active, #recovered{
+        margin-left: 5px;
+        margin-right: 5px;
+    }
+    
+    #deceased{
+        margin-left: 5px;
+    }
+    
+}
+
+@media (max-width: 700px){
+
+    #app-title{
+        font-size: 28px;
+    }
+
+    #confirmed .header, #active .header, #recovered .header, #deceased .header{
+        text-align: center;
+    }
+
+    #confirmed .content, #active .content, #recovered .content, #deceased .content{
+        text-align: center;
+    }
+    
+    #confirmed .header .title, #active .header .title, #recovered .header .title, #deceased .header .title{
+        font-size: 14px;
+    }
+    
+    #confirmed .header .perc, #active .header .perc, #recovered .header .perc, #deceased .header .perc{
+        display: none;
+    }
+    
+    #confirmed .content .t_count, #active .content .t_count, #recovered .content .t_count, #deceased .content .t_count{
+        font-size: 20px;
+        font-weight: 700;
+        vertical-align: middle;
+    }
+
+    #confirmed .content .perc2, #active .content .perc2, #recovered .content .perc2, #deceased .content .perc2{
+        display: inline-block;
+    }
+    
+    #confirmed .content .i_count, #active .content .i_count, #recovered .content .i_count, #deceased .content .i_count{
+        font-size: 12px;
+        font-weight: 700;
+        display: block;
+    }
+    
+}
+
+@media (max-width: 550px){
+
+    #app-title{
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    #confirmed, #active, #recovered, #deceased{
+        /* width: auto; */
+        width: calc(25% - 21px + (15px/2));
+        /* border-radius: 5px; */
+        padding: 0;
+        border: none !important;
+        /* text-overflow: ellipsis !important; */
+        word-break: break-all;
+        vertical-align: text-top;
+    }
+
+    #body{
+        margin: 10px;
+    }
+
+    #confirmed .content .perc2, #active .content .perc2, #recovered .content .perc2, #deceased .content .perc2{
+        display: none;
+    }
+
+    #confirmed .header .title, #active .header .title, #recovered .header .title, #deceased .header .title{
+        font-size: 12px;
+    }
+    
+    #confirmed .content .t_count, #active .content .t_count, #recovered .content .t_count, #deceased .content .t_count{
+        font-size: 18px;
+    }
+    
+    #confirmed .content .i_count, #active .content .i_count, #recovered .content .i_count, #deceased .content .i_count{
+        font-size: 10px;
+    }
+}
+
+.dataTables_wrapper.no-footer .dataTables_scrollBody {
+    border-bottom: 1px solid #ddd;
+}
+
+thead th {
+    border-top: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd !important;
+}
+
+thead th:first-child{
+    border-left: 1px solid #ddd;
+}
+
+tbody td{
+    border-bottom: 1px solid #ddd;
+}
