@@ -58,6 +58,10 @@
     border: 1px solid #6c757d;
 }
 
+#dw-table{
+    font-size: initial;
+}
+
 #confirmed .header, #active .header, #recovered .header, #deceased .header{
     margin-bottom: 10px;
 }
@@ -95,6 +99,8 @@
     #confirmed, #active, #recovered, #deceased{
         width: calc(25% - 41px + (15px/2));
         padding: 10px;
+        height: 55px;
+        overflow: auto;
     }
 
     #confirmed{
@@ -112,10 +118,19 @@
     
 }
 
-@media (max-width: 700px){
+@media (max-width: 800px){
+
+    #confirmed, #active, #recovered, #deceased{
+        height: 70px;
+        /* overflow: auto; */
+    }
 
     #app-title{
         font-size: 28px;
+    }
+
+    #dw-table{
+        font-size: 14px !important;
     }
 
     #confirmed .header, #active .header, #recovered .header, #deceased .header{
@@ -152,7 +167,7 @@
     
 }
 
-@media (max-width: 550px){
+@media (max-width: 650px){
 
     #app-title{
         font-size: 24px;
@@ -161,17 +176,36 @@
     
     #confirmed, #active, #recovered, #deceased{
         /* width: auto; */
-        width: calc(25% - 21px + (15px/2));
+        width: calc(25% - 16px);
         /* border-radius: 5px; */
-        padding: 0;
-        border: none !important;
+        padding: 5px;
+        /* height: 80px; */
+        /* border: none !important; */
         /* text-overflow: ellipsis !important; */
         word-break: break-all;
         vertical-align: text-top;
+        margin: unset;
     }
+
+    /* #confirmed{
+        margin-right: 0px;
+    }
+    
+    #active, #recovered{
+        margin-left: 0;
+        margin-right: 3px;
+    }
+    
+    #deceased{
+        margin-left: 0;
+    } */
 
     #body{
         margin: 10px;
+    }
+
+    #dw-table{
+        font-size: 12px !important;
     }
 
     #confirmed .content .perc2, #active .content .perc2, #recovered .content .perc2, #deceased .content .perc2{
@@ -191,11 +225,29 @@
     }
 }
 
+@media (max-width: 350px){
+    
+    #confirmed, #active, #recovered, #deceased{
+        /* width: calc(25% - 31px + (45px/4));
+        padding: 5px; */
+        border: none !important;
+        height: auto;
+        /* word-break: break-all; */
+        /* vertical-align: text-top; */
+    }
+}
+
 .dataTables_wrapper.no-footer .dataTables_scrollBody {
-    border-bottom: 1px solid #ddd;
+    border-bottom: unset;
 }
 
 thead th {
+    border-top: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd !important;
+}
+
+tbody td{
     border-top: 1px solid #ddd;
     border-right: 1px solid #ddd;
     border-bottom: 1px solid #ddd !important;
@@ -205,6 +257,10 @@ thead th:first-child{
     border-left: 1px solid #ddd;
 }
 
-tbody td{
-    border-bottom: 1px solid #ddd;
+tbody td:first-child{
+    border-left: 1px solid #ddd;
 }
+
+/* tbody td{
+    border-bottom: 1px solid #ddd;
+} */
