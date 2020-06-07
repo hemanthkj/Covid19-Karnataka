@@ -1,31 +1,82 @@
-#body{
- font-family: sans-serif;
- letter-spacing: .02em;
- margin: 20px;
+body{
+    margin: unset;
+    font-family: sans-serif;
+    letter-spacing: .02em;
 }
 
-#app-title{
+#main-content{
+    margin: 20px;
+}
+
+#app-header{
+    margin: 0 0 20px 0;
+    text-align: center;
+    padding: 10px 0 10px 0;
+    background-color: #212121;
+    color: #dcdcdc;
+}
+
+#app-header #title{
     font-size: 30px;
     font-weight: 700;
-    margin: 10px 0 30px 0;
-    text-align: center;
 }
 
-#state-name{
-    font-size: 25px;
-    font-weight: 700;
-    margin: 10px 0 10px 0;
+.language-dropdown{
+    position: relative;
+    float: right;
+    line-height: 2;
+    padding-right: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.dropdown-content{
+    padding: 10px 0px;
+    min-width: 100px;
+    text-overflow: ellipsis;
+    font-size: 15px;
+    font-family: sans-serif;
+    font-weight: 600;
+    z-index: 1;
+    position: absolute;
+    background-color: white;
+    top: 35px;
+    right: 0px;
+    display: none;
+    /* box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); */
+    border: 1px solid darkgray;
+    border-radius: 7px;
+    color: #494949;
+}
+
+.dc-item{
+    padding : 5px 10px;
+    cursor: pointer;
+    text-overflow: ellipsis;
+}
+
+.dc-item:hover{
+    /* color: white; */
+    background-color: #f2f2f2;
 }
 
 #total-numbers-info{
-    width: 100%;
-    display: block;
-    margin: 0 auto 20px auto;
+    /* width: 100%; */
+    display: flex;
+    margin-bottom: 20px;
+}
+
+#daily-changes-graph, #dcg-confirmed, #dcg-confirmed2, #dcg-active, #dcg-recovered, #dcg-deceased{
+    margin-bottom: 20px;
+    height: auto;
+    width: auto;
 }
 
 #confirmed, #active, #recovered, #deceased{
-    display: inline-block;
-    width: calc(25% - 61px);
+    /* display: inline-block; */
+    flex: 1;
+    /* width: calc(25% - 61px); */
     border-radius: 5px;
     padding: 20px;
 }
@@ -33,28 +84,24 @@
 #confirmed{
     color: #ff073a;
     border: 1px solid #ff073a;
-    margin-right: 10px;
+    margin-right: 5px;
 }
 
 #active {
     color: #007bff;
     border: 1px solid #007bff;
+    margin-right: 5px;
 }
 
 #recovered{
     color: #28a745;
     border: 1px solid #28a745;
-
-}
-
-#active, #recovered{
-    margin-left: 10px;
-    margin-right: 10px;
+    margin-right: 5px;
 }
 
 #deceased{
     color: #6c757d;
-    margin-left: 10px;
+    /* margin-left: 10px; */
     border: 1px solid #6c757d;
 }
 
@@ -96,14 +143,15 @@
 }
 
 @media (max-width: 900px){
+
     #confirmed, #active, #recovered, #deceased{
-        width: calc(25% - 41px + (15px/2));
+        /* width: calc(25% - 41px + (15px/2)); */
         padding: 10px;
-        height: 55px;
-        overflow: auto;
+        /* height: 55px; */
+        /* overflow: auto; */
     }
 
-    #confirmed{
+    /* #confirmed{
         margin-right: 5px;
     }
     
@@ -114,20 +162,23 @@
     
     #deceased{
         margin-left: 5px;
-    }
+    } */
     
 }
 
 @media (max-width: 800px){
-
-    #confirmed, #active, #recovered, #deceased{
-        height: 70px;
-        /* overflow: auto; */
-    }
-
-    #app-title{
+    #app-header #title{
         font-size: 28px;
+        /* font-weight: 700; */
+        /* margin: 0 0 20px 0; */
+        /* text-align: center; */
+        /* padding: 10px 0 10px 0; */
     }
+
+    /* #confirmed, #active, #recovered, #deceased{
+        height: 70px;
+        overflow: auto;
+    } */
 
     #dw-table{
         font-size: 14px !important;
@@ -168,40 +219,25 @@
 }
 
 @media (max-width: 650px){
+    
+    #app-header{
+        padding: 5px 0;
+    }
 
-    #app-title{
+    #app-header #title{
         font-size: 24px;
-        margin-bottom: 20px;
     }
     
     #confirmed, #active, #recovered, #deceased{
-        /* width: auto; */
-        width: calc(25% - 16px);
-        /* border-radius: 5px; */
+        /* width: calc(25% - 16px); */
         padding: 5px;
-        /* height: 80px; */
-        /* border: none !important; */
-        /* text-overflow: ellipsis !important; */
         word-break: break-all;
-        vertical-align: text-top;
-        margin: unset;
+        /* vertical-align: text-top; */
+        /* margin: unset; */
     }
 
-    /* #confirmed{
-        margin-right: 0px;
-    }
-    
-    #active, #recovered{
-        margin-left: 0;
-        margin-right: 3px;
-    }
-    
-    #deceased{
-        margin-left: 0;
-    } */
-
-    #body{
-        margin: 10px;
+    #main-content{
+        margin: 10px !important;
     }
 
     #dw-table{
@@ -223,15 +259,124 @@
     #confirmed .content .i_count, #active .content .i_count, #recovered .content .i_count, #deceased .content .i_count{
         font-size: 10px;
     }
+
+    .dataTables_wrapper .dataTables_filter input{
+        float: right !important;
+    }
+
+    #perc-info-0{
+        display: none !important;
+    }
+    
+    #perc-info-1{
+        display: flex !important;
+    }
+    
+    #perc-info-2{
+        display: flex !important;
+    }
+
+    #recovery-rate{
+        margin-right: unset !important;
+    }
+
 }
+
+@media (max-width: 500px){
+
+    #confirmed, #active, #recovered, #deceased{
+        border: none;
+    }
+
+    #confirmed{
+        background-color: rgb(255, 230, 235);
+    }
+
+    #active{
+        background-color: rgb(239, 247, 255);
+    }
+
+    #recovered{
+        background-color: rgb(228, 244, 232);
+    }
+
+    #deceased{
+        background-color: rgb(246, 246, 247);
+    }
+
+    #app-header #title{
+        font-size: 20px;
+    }
+
+    .dataTables_wrapper .dataTables_filter input{
+        width: 150px !important;
+    }
+}
+
+@media (max-width: 400px){
+
+    #active-rate div:nth-child(1){
+        font-size: 13px !important;
+    }
+    
+    #active-rate div:nth-child(2){
+        font-size: 18px !important;
+    }
+    
+    #active-rate div:nth-child(3){
+        font-size: 12px !important;
+    }
+    
+    #recovery-rate div:nth-child(1){
+        font-size: 13px !important;
+    }
+    
+    #recovery-rate div:nth-child(2){
+        font-size: 18px !important;
+    }
+    
+    #recovery-rate div:nth-child(3){
+        font-size: 12px !important;
+    }
+ 
+    #mortality-rate div:nth-child(1){
+        font-size: 13px !important;
+    }
+    
+    #mortality-rate div:nth-child(2){
+        font-size: 18px !important;
+    }
+    
+    #mortality-rate div:nth-child(3){
+        font-size: 12px !important;
+    }
+    
+    #avg-growth-rate div:nth-child(1){
+        font-size: 13px !important;
+    }
+    
+    #avg-growth-rate div:nth-child(2){
+        font-size: 18px !important;
+    }
+    
+    #avg-growth-rate div:nth-child(3){
+        font-size: 11px !important;
+    }
+    
+    #avg-growth-rate div:nth-child(4){
+        font-size: 12px !important;
+    }
+
+}
+
 
 @media (max-width: 350px){
     
     #confirmed, #active, #recovered, #deceased{
         /* width: calc(25% - 31px + (45px/4));
         padding: 5px; */
-        border: none !important;
-        height: auto;
+        /* border: none !important; */
+        /* height: auto; */
         /* word-break: break-all; */
         /* vertical-align: text-top; */
     }
@@ -261,6 +406,162 @@ tbody td:first-child{
     border-left: 1px solid #ddd;
 }
 
-/* tbody td{
-    border-bottom: 1px solid #ddd;
-} */
+.dataTables_wrapper .dataTables_filter input{
+    margin-bottom: 10px !important;
+    padding: 3px 5px 3px 7px;
+}
+
+#footer{
+    background-color: #212121;
+    font-weight: 600;
+    /* color: #dcdcdc; */
+}
+
+#footer #source, #footer #contact-info{
+    width:220px;
+    padding: 10px;
+    margin: 0 auto;
+    background-color: #dcdcdc;
+    color:#212121;
+    border-radius: 5px;
+}
+
+#footer #contact-info{
+    margin-top:10px;
+}
+
+#footer #source div:nth-child(1), #footer #contact-info div:nth-child(1){
+    font-size: 16px;
+}
+
+#footer #source div:nth-child(2), #footer #contact-info div:nth-child(2), #footer #contact-info div:nth-child(3){
+    font-size: 14px;
+}
+
+#footer #source div:nth-child(2) img{
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+#footer #source div:nth-child(2):hover{
+    text-decoration: underline;
+}
+
+#perc-info-0{
+    display: flex;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+#perc-info-1{
+    margin-bottom: 10px;
+    display: none;
+}
+
+#perc-info-2{
+    margin-bottom: 20px;
+    display: none;
+}
+
+#active-rate, #recovery-rate, #mortality-rate, #avg-growth-rate{
+    padding: 10px;
+    border-radius: 7px;
+    flex: 1;
+}
+
+#active-rate{
+    background-color: rgb(239, 247, 255);
+    margin-right: 5px;
+    font-weight: 700;
+}
+
+#active-rate div:nth-child(1){
+    font-size: 14px;
+    color: #017cff;
+    margin-bottom: 5px;
+}
+
+#active-rate div:nth-child(2){
+    font-size: 18px;
+    color: #017cff;
+    margin-bottom: 10px;
+}
+
+#active-rate div:nth-child(3){
+    font-size: 13px;
+    color: #017cff;
+}
+
+#recovery-rate{
+    background-color: rgb(228, 244, 232);
+    font-weight: 700;
+    margin-right: 5px;
+}
+
+#recovery-rate div:nth-child(1){
+    font-size: 14px;
+    color: #29a746;
+    margin-bottom: 5px;
+}
+
+#recovery-rate div:nth-child(2){
+    font-size: 18px;
+    color: #29a746;
+    margin-bottom: 10px;
+}
+
+#recovery-rate div:nth-child(3){
+    font-size: 13px;
+    color: #29a746;
+}
+
+#mortality-rate{
+    background-color: rgb(246, 246, 247);
+    margin-right: 5px;
+    font-weight: 700;
+}
+
+
+#mortality-rate div:nth-child(1){
+    font-size: 14px;
+    color: #6d767e;
+    margin-bottom: 5px;
+}
+
+#mortality-rate div:nth-child(2){
+    font-size: 18px;
+    color: #6d767e;
+    margin-bottom: 10px;
+}
+
+#mortality-rate div:nth-child(3){
+    font-size: 13px;
+    color: #6d767e;
+}
+
+#avg-growth-rate{
+    background-color: #f8f2ed;
+    font-weight: 700;
+}
+
+#avg-growth-rate div:nth-child(1){
+    font-size: 14px;
+    color: #b88448;
+    margin-bottom: 5px;
+}
+
+#avg-growth-rate div:nth-child(2){
+    font-size: 18px;
+    color: #b88448;
+}
+
+#avg-growth-rate div:nth-child(3){
+    font-size: 12px;
+    color: #b88448;
+    margin-bottom: 10px;
+}
+
+#avg-growth-rate div:nth-child(4){
+    font-size: 13px;
+    color: #b88448;
+}
