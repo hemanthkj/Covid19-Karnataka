@@ -166,6 +166,7 @@ function plotEverything(langCode) {
                 if (max_value.rcvd < y[element]['t_recovered']) max_value.rcvd = y[element]['t_recovered'];
                 if (max_value.decd < y[element]['t_deceased']) max_value.decd = y[element]['t_deceased'];
             }
+            // added to test
             createDailyChangesGraph(rows_data.cfmd, getLineChartColumns('cfmd', langCode), 'dcg-confirmed', getLineChartOptions('cfmd', max_value.cfmd));
             createDailyChangesGraph(rows_data.actv, getLineChartColumns('actv', langCode), 'dcg-active', getLineChartOptions('actv', max_value.actv));
             createDailyChangesGraph(rows_data.rcvd, getLineChartColumns('rcvd', langCode), 'dcg-recovered', getLineChartOptions('rcvd', max_value.rcvd));
