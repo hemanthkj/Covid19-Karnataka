@@ -180,7 +180,6 @@ function plotEverything(langCode) {
 }
 
 function createTotalNoInfo(y, langCode) {
-    //
     $('#confirmed .header .title').text(config_data.labels.cfmd[langCode]);
     $('#confirmed .content .t_count').text(y.confirmed.t_count);
     $('#confirmed .content .i_count').text(`[+${y.confirmed.i_count}]`);
