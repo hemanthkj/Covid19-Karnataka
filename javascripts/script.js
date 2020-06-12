@@ -166,6 +166,61 @@ function plotEverything(langCode) {
                 if (max_value.rcvd < y[element]['t_recovered']) max_value.rcvd = y[element]['t_recovered'];
                 if (max_value.decd < y[element]['t_deceased']) max_value.decd = y[element]['t_deceased'];
             }
+            // new1
+                        var trace1 = {
+			  x: rows_data.cfmd.map((a)=>{return a[0]}),
+			  y: rows_data.cfmd.map((a)=>{return a[1]}),
+			  mode: 'lines+markers',
+			  line: {
+				  color : config_data.colors['cfmd']
+			  },
+			  marker: {
+				  size: 4,
+//				  symbol: 'circle-open',
+//				  opacity: 1
+			  },
+			  name: 'Confirmed'
+			};
+			
+            var layout = {
+//            		title: 'Quarter 1 Growth',
+//             		font: {
+//                         family: 'monospace',
+//                         size: 12
+
+//                     },
+            		height: 200,
+            		xaxis: {
+//            			title: 'Date',
+            			type : 'date',
+            			showgrid: false,
+            			zeroline: true,
+//            			color : config_data.colors['cfmd']
+            		},
+	        		yaxis: {
+//	        			title: 'Percent',
+	        		    showline: true,
+	        			showgrid: false,
+//	        			zeroline: true,
+//	        			color : config_data.colors['cfmd']
+	        		},
+	        		margin : {
+	        			l: 45,
+	        			r: 20,
+	        			t: 20,
+	        			b: 30,
+	        			autoexpand : false
+	        			
+	        		},
+	        		autosize : true,
+	        		paper_bgcolor: config_data.bg_colors['cfmd'],
+	        		plot_bgcolor: config_data.bg_colors['cfmd']
+    		};
+            
+            var data = [trace1];
+
+            Plotly.newPlot('dcg-confirmed2', data, layout, {displayModeBar: false});
+            // new
 
             createDailyChangesGraph(rows_data.cfmd, getLineChartColumns('cfmd', langCode), 'dcg-confirmed', getLineChartOptions('cfmd', max_value.cfmd));
             createDailyChangesGraph(rows_data.actv, getLineChartColumns('actv', langCode), 'dcg-active', getLineChartOptions('actv', max_value.actv));
