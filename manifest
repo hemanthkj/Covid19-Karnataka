@@ -1,0 +1,7 @@
+{
+  "name": "COVID-19 KARNATAKA",
+  "description": "Covid-19 statistics of Karnataka state.",
+  "start_url": "/",
+  "display": "standalone",
+  "scope": "/"
+}

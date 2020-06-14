@@ -20,8 +20,10 @@ var config_data = {
         actv: { eng: "Active", "kan": "ಸಕ್ರಿಯರು" },
         rcvd: { eng: "Recovered", "kan": "ಗುಣಮುಖರು" },
         decd: { eng: "Deceased", "kan": "ಮೃತಪಟ್ಟವರು" },
+        "all districts": { eng: "All Districts", "kan": "ಎಲ್ಲಾ ಜಿಲ್ಲೆಗಳು" },
         udupi: { eng: "Udupi", "kan": "ಉಡುಪಿ" },
         kalaburagi: { eng: "Kalaburagi", "kan": "ಕಲಬುರಗಿ" },
+        "bengaluru": { eng: "Bengaluru", "kan": "ಬೆಂಗಳೂರು" },
         "bengaluru urban": { eng: "Bengaluru Urban", "kan": "ಬೆಂಗಳೂರು ನಗರ" },
         yadgir: { eng: "Yadagiri", "kan": "ಯಾದಗಿರಿ" },
         raichur: { eng: "Raichur", "kan": "ರಾಯಚೂರು" },
@@ -50,7 +52,12 @@ var config_data = {
         koppal: { eng: "Koppal", "kan": "ಕೊಪ್ಪಳ" },
         ramanagara: { eng: "Ramanagara", "kan": "ರಾಮನಗರ" },
         kodagu: { eng: "Kodagu", "kan": "ಕೊಡಗು" },
-        chamarajanagara: { eng: "Chamarajanagara", "kan": "ಚಾಮರಾಜನಗರ" }
+        chamarajanagara: { eng: "Chamarajanagara", "kan": "ಚಾಮರಾಜನಗರ" },
+        beginning: { eng: "Beginning", "kan": "ಆರಂಭದಿಂದ" },
+        one_month: { eng: "1 Month", "kan": "ಒಂದು ತಿಂಗಳು" },
+        one_week: { eng: "1 Week", "kan": "ಒಂದು ವಾರ" },
+        "spread trends": { eng: "Spread Trends", "kan": "ವಿಸ್ತರಿಸಿದ ಪ್ರವೃತ್ತಿ" },
+        "district-wise details": { eng: "District-wise Details", "kan": "ಜಿಲ್ಲಾವಾರು ವಿವರಗಳು" }
     },
     perc_info: {
         actv_rate: {
@@ -72,182 +79,247 @@ var config_data = {
     }
 
 };
-
-var district_wise_table;
 var selectedLanguageCode = 'kan';
-
-var total_numbers_info = {
+var data_api = {
     "url": "https://api.covid19india.org/data.json",
     "method": "GET",
     "timeout": 0,
 };
-
-var state_district_wise = {
+var state_district_wise_api = {
     "url": "https://api.covid19india.org/v2/state_district_wise.json",
     "method": "GET",
     "timeout": 0,
 };
-
-var states_daily_changes = {
+var states_daily_api = {
     "url": "https://api.covid19india.org/states_daily.json",
     "method": "GET",
     "timeout": 0,
 };
 
+var districts_daily_api = {
+    "url": "https://api.covid19india.org/districts_daily.json",
+    "method": "GET",
+    "timeout": 0,
+};
+
+// var stats_data = stats_data;
+// var state_district_wise = state_district_wise;
+// var states_daily = states_daily;
+// var districtsDaily = createDailyChangesDataForDistrict('Karnataka', 'Mandya', districtsDailyData['districtsDaily'])
+var district_wise_table;
+var currentGraphData;
+var currentGraphLoc;
+var stats_data;
+var state_district_wise;
+var states_daily;
+var districtsDailyData;
+var today = new Date();
 $(document).ready(function () {
-    console.log('75');
-    plotEverything(selectedLanguageCode);
-})
-
-function plotEverything(langCode) {
-    $.ajax(total_numbers_info).done(function (response) {
-        const s_x = response["statewise"].filter((x) => { return x['statecode'].toLowerCase() == 'ka' })[0];
-        const s_y = new State(s_x.confirmed, s_x.deltaconfirmed, s_x.active, s_x.deltaconfirmed - s_x.deltarecovered - s_x.deltadeaths, s_x.recovered, s_x.deltarecovered, s_x.deaths, s_x.deltadeaths);
-        // console.log(s_y);
-        // console.log(formatDate(new Date().setDate(new Date().getDate() - 7), 'dd-mmm-yy'));
-
-        createTotalNoInfo(s_y, langCode);
-        $.ajax(states_daily_changes).done(function (response) {
-            let y = createDailyChangesDataForState('ka', response['states_daily']);
-            // console.log(y);
-            let today = new Date();
-            let sevenDayBefore = new Date().setDate(new Date().getDate() - 7);
-            // console.log(formatDate(today, 'dd mmm yyyy'));
-            // console.log(formatDate(sevenDayBefore, 'dd mmm yyyy'));
-
-            let sevenDayBeforeData = y[formatDate(sevenDayBefore, 'dd-mmm-yy')];
-            let sevenDayBeforePeriod = formatDate(today, 'dd mmm yyyy') + ' - ' + formatDate(sevenDayBefore, 'dd mmm yyyy');
-            // console.log();
-            createPercInfo(s_y, sevenDayBeforeData, sevenDayBeforePeriod, langCode);
-            let dates = Object.keys(y);
-            let rows_data = {
-                cfmd: [],
-                actv: [],
-                rcvd: [],
-                decd: []
-            };
-            let max_value = {
-                cfmd: 0,
-                actv: 0,
-                rcvd: 0,
-                decd: 0
-            };
-            for (let i = 0; i < dates.length; i++) {
-                const element = dates[i];
-                // rows_data.push([
-                //     new Date(element),
-                //     y[element]['confirmed'],
-                //     y[element]['active'],
-                //     y[element]['recovered'],
-                //     y[element]['deceased'],
-                // ])
-                rows_data.cfmd.push([
-                    new Date(element),
-                    y[element]['t_confirmed'],
-                    createCustomHTMLContent('cfmd', element, y[element]['t_confirmed'], y[element]['confirmed'])
-                ])
-                rows_data.actv.push([
-                    new Date(element),
-                    y[element]['t_active'],
-                    createCustomHTMLContent('actv', element, y[element]['t_active'], y[element]['active'])
-                ])
-                rows_data.rcvd.push([
-                    new Date(element),
-                    y[element]['t_recovered'],
-                    createCustomHTMLContent('rcvd', element, y[element]['t_recovered'], y[element]['recovered'])
-                ])
-                rows_data.decd.push([
-                    new Date(element),
-                    y[element]['t_deceased'],
-                    createCustomHTMLContent('decd', element, y[element]['t_deceased'], y[element]['deceased'])
-                ])
-                if (max_value.cfmd < y[element]['t_confirmed']) max_value.cfmd = y[element]['t_confirmed'];
-                if (max_value.actv < y[element]['t_active']) max_value.actv = y[element]['t_active'];
-                if (max_value.rcvd < y[element]['t_recovered']) max_value.rcvd = y[element]['t_recovered'];
-                if (max_value.decd < y[element]['t_deceased']) max_value.decd = y[element]['t_deceased'];
-            }
-            // added to test
-            createDailyChangesGraph(rows_data.cfmd, getLineChartColumns('cfmd', langCode), 'dcg-confirmed', getLineChartOptions('cfmd', max_value.cfmd));
-            createDailyChangesGraph(rows_data.actv, getLineChartColumns('actv', langCode), 'dcg-active', getLineChartOptions('actv', max_value.actv));
-            createDailyChangesGraph(rows_data.rcvd, getLineChartColumns('rcvd', langCode), 'dcg-recovered', getLineChartOptions('rcvd', max_value.rcvd));
-            createDailyChangesGraph(rows_data.decd, getLineChartColumns('decd', langCode), 'dcg-deceased', getLineChartOptions('decd', max_value.decd));
-            $.ajax(state_district_wise).done(function (response) {
-                const d_x = response.filter((x) => { return x['statecode'].toLowerCase() == 'ka' })[0];
-                const d_y = d_x['districtData'].map((a) => { return new District(s_y, a, langCode) });
-                createTable(d_y, langCode)
+    $.ajax(data_api).done(function (r1) {
+        const s_x = r1["statewise"].filter((x) => { return x['statecode'].toLowerCase() == 'ka' })[0];
+        stats_data = new State(s_x);
+        $.ajax(states_daily_api).done(function (r2) {
+            states_daily = createDailyChangesDataForState('ka', r2['states_daily']);
+            $.ajax(districts_daily_api).done(function (r3) {
+                // districtsDailyData = createDailyChangesDataForDistrict('Karnataka', 'Mandya', districtsDailyData['districtsDaily'])
+                districtsDailyData = r3;
+                $.ajax(state_district_wise_api).done(function (r4) {
+                    state_district_wise = r4.filter((x) => { return x['statecode'].toLowerCase() == 'ka' })[0];
+                    // let d_y = state_district_wise['districtData'].map((a) => { return new District(stats_data, a, selectedLanguageCode) });
+                    insertContentIntoPage(stats_data, states_daily, state_district_wise, selectedLanguageCode);
+                });
             });
         });
     });
+    // let d_y = state_district_wise['districtData'].map((a) => { return new District(stats_data, a, selectedLanguageCode) });
+    // insertContentIntoPage(stats_data, states_daily, state_district_wise, selectedLanguageCode);
+    // createDailyChangesDataForDistrict('Karnataka', 'Mandya', districtsDailyData['districtsDaily'])
+})
+
+
+function insertContentIntoPage(stats, sDaily, sDistrictWise, lCode) {
+    $('head title').text(config_data.labels.appTitle[lCode]);
+    $('#n-title').text(config_data.labels.appTitle[lCode]);
+    $('#ld-label').text(config_data.labels[lCode]);
+    createSection1(stats, lCode);
+    createSection2(stats, sDaily, lCode);
+    currentGraphData = sDaily;
+    currentGraphLoc = 'all districts';
+    createGraphFilters(Object.keys(districtsDailyData['districtsDaily']['Karnataka']))
+    createSection3(sDaily, lCode);
+    createSection4(stats, sDistrictWise, lCode);
+    createFooter();
 }
 
-function createTotalNoInfo(y, langCode) {
-    $('#confirmed .header .title').text(config_data.labels.cfmd[langCode]);
-    $('#confirmed .content .t_count').text(y.confirmed.t_count);
-    $('#confirmed .content .i_count').text(`[+${y.confirmed.i_count}]`);
-    //
-    $('#active .header .title').text(config_data.labels.actv[langCode]);
-    $('#active .content .t_count').text(y.active.t_count);
-    if (Math.sign(y.active.i_count) == -1) $('#active .content .i_count').text(`[-${Math.abs(y.active.i_count)}]`);
-    else $('#active .content .i_count').text(`[+${y.active.i_count}]`);
-    $('#active .header .perc').text(`${y.active.perc}%`);
-    $('#active .content .perc2').text(`(${y.active.perc}%)`);
-    //
-    $('#recovered .header .title').text(config_data.labels.rcvd[langCode]);
-    $('#recovered .content .t_count').text(y.recovered.t_count);
-    $('#recovered .content .i_count').text(`[+${y.recovered.i_count}]`);
-    $('#recovered .header .perc').text(`${y.recovered.perc}%`);
-    $('#recovered .content .perc2').text(`(${y.recovered.perc}%)`);
-    //
-    $('#deceased .header .title').text(config_data.labels.decd[langCode]);
-    $('#deceased .content .t_count').text(y.deceased.t_count);
-    $('#deceased .content .i_count').text(`[+${y.deceased.i_count}]`);
-    $('#deceased .header .perc').text(`${y.deceased.perc}%`);
-    $('#deceased .content .perc2').text(`(${y.deceased.perc}%)`);
+function createSection1(y, lCode) {
+    let d = `<div id="confirmed">
+                <div id="c-header">
+                    <span class="title">${config_data.labels.cfmd[lCode]}</span>
+                </div>
+                <div id="c-content">
+                    <span class="t_count">${y.confirmed.t_count}</span>
+                    <span class="i_count">[+${y.confirmed.i_count}]</span>
+                </div>
+            </div>
+            <div id="active">
+                <div id="a-header">
+                    <span class="title">${config_data.labels.actv[lCode]}</span>
+                </div>
+                <div id="a-content">
+                    <span class="t_count">${y.active.t_count}</span>
+                    <span class="i_count">${ Math.sign(y.active.i_count) == -1 ? '[-' + Math.abs(y.active.i_count) + ']' : '[+' + y.active.i_count + ']'}</span>
+                </div>
+            </div>
+            <div id="recovered">
+                <div id="r-header">
+                    <span class="title">${config_data.labels.rcvd[lCode]}</span>
+                </div>
+                <div id="r-content">
+                    <span class="t_count">${y.recovered.t_count}</span>
+                    <span class="i_count">[+${y.recovered.i_count}]</span>
+                </div>
+            </div>
+            <div id="deceased">
+                <div id="d-header">
+                    <span class="title">${config_data.labels.decd[lCode]}</span>
+                </div>
+                <div id="d-content">
+                    <span class="t_count">${y.deceased.t_count}</span>
+                    <span class="i_count">[+${y.deceased.i_count}]</span>
+                </div>
+            </div>`
+    $('#section-1').html(d);
 };
 
-function createPercInfo(y, sdbd, sdbp, langCode) {
-    $('#perc-info-0').empty();
-    $('#perc-info-1').empty();
-    $('#perc-info-2').empty();
-    let avg_growth_rate = (((y.confirmed.t_count - sdbd.t_confirmed) / sdbd.t_confirmed) * 100) / 7;
+function createSection2(stats, sDaily, lCode) {
+
+    let sevenDayBefore = new Date().setDate(new Date().getDate() - 7);
+    let sdbd = sDaily[formatDate(sevenDayBefore, 'dd-mmm-yy')]; // Seven Day Before Data
+    let sdbp = formatDate(today, 'dd mmm yyyy') + ' - ' + formatDate(sevenDayBefore, 'dd mmm yyyy'); // Seven Day Before Period
+    // console.log(sdbd);
+    console.log(stats.recovered.perc)
+    console.log(Math.round(stats.recovered.perc));
+
+    let avg_growth_rate = (((stats.confirmed.t_count - sdbd.t_confirmed) / sdbd.t_confirmed) * 100) / 7;
     var perc_info_1 = `<div id="active-rate">
-                            <div>${config_data.perc_info.actv_rate.title[langCode]}</div>
-                            <div>${y.active.perc}%</div>
-                            <div>${config_data.perc_info.actv_rate.desc[langCode].replace('{num}', Math.round(parseInt(y.active.perc)))}</div>
+                            <div>${config_data.perc_info.actv_rate.title[lCode]}</div>
+                            <div>${stats.active.perc.toFixed(2)}%</div>
+                            <div>${config_data.perc_info.actv_rate.desc[lCode].replace('{num}', Math.round(stats.active.perc))}</div>
                         </div>
                         <div id="recovery-rate">
-                            <div>${config_data.perc_info.rcvd_rate.title[langCode]}</div>
-                            <div>${y.recovered.perc}%</div>
-                            <div>${config_data.perc_info.rcvd_rate.desc[langCode].replace('{num}', Math.round(parseInt(y.recovered.perc)))}</div>
+                            <div>${config_data.perc_info.rcvd_rate.title[lCode]}</div>
+                            <div>${stats.recovered.perc.toFixed(2)}%</div>
+                            <div>${config_data.perc_info.rcvd_rate.desc[lCode].replace('{num}', Math.round(stats.recovered.perc))}</div>
                         </div>`
     var perc_info_2 = `<div id="mortality-rate">
-                            <div>${config_data.perc_info.decd_rate.title[langCode]}</div>
-                            <div>${y.deceased.perc}%</div>
-                            <div>${config_data.perc_info.decd_rate.desc[langCode].replace('{num}', Math.round(parseInt(y.deceased.perc)))}</div>
+                            <div>${config_data.perc_info.decd_rate.title[lCode]}</div>
+                            <div>${stats.deceased.perc.toFixed(2)}%</div>
+                            <div>${config_data.perc_info.decd_rate.desc[lCode].replace('{num}', Math.round(stats.deceased.perc))}</div>
                         </div>
                         <div id="avg-growth-rate">
-                            <div>${config_data.perc_info.avg_growth_rate.title[langCode]}</div>
+                            <div>${config_data.perc_info.avg_growth_rate.title[lCode]}</div>
                             <div>${Math.round(avg_growth_rate)}%</div>
                             <div>${sdbp}</div>
-                            <div>${config_data.perc_info.avg_growth_rate.desc[langCode].replace('{num}', Math.round(avg_growth_rate) + '%')}</div>
+                            <div>${config_data.perc_info.avg_growth_rate.desc[lCode].replace('{num}', Math.round(avg_growth_rate) + '%')}</div>
                         </div>`
-    $('#perc-info-0').append(perc_info_1 + perc_info_2);
-    $('#perc-info-1').append(perc_info_1);
-    $('#perc-info-2').append(perc_info_2);
+    $('#section-2').html(`<div id="perc-info-0">${perc_info_1 + perc_info_2}</div><div id="perc-info-1">${perc_info_1}</div><div id="perc-info-2">${perc_info_2}</div>`);
 }
 
-function createTable(data, langCode) {
-    console.log(data);
+function createGraphFilters(districts) {
+    let options = '';
+    districts.forEach(element => {
+        options += `<option value="${element}">${config_data['labels'][element.toLowerCase()] ? config_data['labels'][element.toLowerCase()][selectedLanguageCode] : element}</option>`;
+    });
+    let data = `<div>${config_data['labels']['spread trends'][selectedLanguageCode]}</div>
+                <div id="g-filter">
+                    <span id="g-district-filter">
+                        <select onchange="onChangeDistrict(event)">
+                            <option value="All Districts">${config_data.labels['all districts'][selectedLanguageCode]}</option>
+                            ${options}
+                        </select>
+                    </span>
+                    <span id="g-date-filter">
+                        <span id="beginning" class="active-df" onclick="onClickGDateFilter('beginning')">${config_data.labels.beginning[selectedLanguageCode]}</span>
+                        <span id="one_month" onclick="onClickGDateFilter('one_month')">${config_data.labels.one_month[selectedLanguageCode]}</span>
+                        <span id="one_week" onclick="onClickGDateFilter('one_week')">${config_data.labels.one_week[selectedLanguageCode]}</span>
+                    </span>
+                </div>`
+    $('#graphFilters').html(data);
+}
 
+function createSection3(sDaily, lCode) {
+    let dates = Object.keys(sDaily);
+    let rows_data = {
+        cfmd: [],
+        actv: [],
+        rcvd: [],
+        decd: []
+    };
+    let max_value = {
+        cfmd: sDaily[dates[0]]['t_confirmed'],
+        actv: sDaily[dates[0]]['t_active'],
+        rcvd: sDaily[dates[0]]['t_recovered'],
+        decd: sDaily[dates[0]]['t_deceased']
+    };
+
+    let min_value = {
+        cfmd: sDaily[dates[0]]['t_confirmed'],
+        actv: sDaily[dates[0]]['t_active'],
+        rcvd: sDaily[dates[0]]['t_recovered'],
+        decd: sDaily[dates[0]]['t_deceased']
+    }
+    for (let i = 0; i < dates.length; i++) {
+        const element = dates[i];
+        rows_data.cfmd.push([
+            new Date(element),
+            sDaily[element]['t_confirmed'],
+            createCustomHTMLContent('cfmd', element, sDaily[element]['t_confirmed'], sDaily[element]['confirmed'])
+        ])
+        rows_data.actv.push([
+            new Date(element),
+            sDaily[element]['t_active'],
+            createCustomHTMLContent('actv', element, sDaily[element]['t_active'], sDaily[element]['active'])
+        ])
+        rows_data.rcvd.push([
+            new Date(element),
+            sDaily[element]['t_recovered'],
+            createCustomHTMLContent('rcvd', element, sDaily[element]['t_recovered'], sDaily[element]['recovered'])
+        ])
+        rows_data.decd.push([
+            new Date(element),
+            sDaily[element]['t_deceased'],
+            createCustomHTMLContent('decd', element, sDaily[element]['t_deceased'], sDaily[element]['deceased'])
+        ])
+        if (max_value.cfmd < sDaily[element]['t_confirmed']) max_value.cfmd = sDaily[element]['t_confirmed'];
+        if (max_value.actv < sDaily[element]['t_active']) max_value.actv = sDaily[element]['t_active'];
+        if (max_value.rcvd < sDaily[element]['t_recovered']) max_value.rcvd = sDaily[element]['t_recovered'];
+        if (max_value.decd < sDaily[element]['t_deceased']) max_value.decd = sDaily[element]['t_deceased'];
+
+        if (min_value.cfmd > sDaily[element]['t_confirmed']) min_value.cfmd = sDaily[element]['t_confirmed'];
+        if (min_value.actv > sDaily[element]['t_active']) min_value.actv = sDaily[element]['t_active'];
+        if (min_value.rcvd > sDaily[element]['t_recovered']) min_value.rcvd = sDaily[element]['t_recovered'];
+        if (min_value.decd > sDaily[element]['t_deceased']) min_value.decd = sDaily[element]['t_deceased'];
+    }
+    createDailyChangesGraph(rows_data.cfmd, getLineChartColumns('cfmd', lCode), 'dcg-confirmed', getLineChartOptions('cfmd', max_value.cfmd, min_value.cfmd));
+    createDailyChangesGraph(rows_data.actv, getLineChartColumns('actv', lCode), 'dcg-active', getLineChartOptions('actv', max_value.actv, min_value.actv));
+    createDailyChangesGraph(rows_data.rcvd, getLineChartColumns('rcvd', lCode), 'dcg-recovered', getLineChartOptions('rcvd', max_value.rcvd, min_value.rcvd));
+    createDailyChangesGraph(rows_data.decd, getLineChartColumns('decd', lCode), 'dcg-deceased', getLineChartOptions('decd', max_value.decd, min_value.decd));
+}
+
+function createSection4(statsData, sDistrictWise, lCode) {
+    $('#s4-header').text(config_data.labels['district-wise details'][lCode]);
+    console.log(sDistrictWise)
+    let data = sDistrictWise['districtData'].map((a) => { return new District(statsData, a, lCode) }).sort((a, b) => { return a.confirmed['t_count'] - b.confirmed['t_count'] });
+    console.log(data)
     district_wise_table = $('#dw-table-info').DataTable({
         data: data,
         columns: [
-            { data: "district", title: config_data.labels.district[langCode] },
-            { data: "confirmed.t_count", title: config_data.labels.cfmd[langCode] },
-            { data: "active.t_count", title: config_data.labels.actv[langCode] },
-            { data: "recovered.t_count", title: config_data.labels.rcvd[langCode] },
-            { data: "deceased.t_count", title: config_data.labels.decd[langCode] },
-            { data: "confirmed.perc", title: config_data.labels.cfmd[langCode] + ' (%)' }
+            { data: "district", title: config_data.labels.district[lCode] },
+            { data: "confirmed.t_count", title: config_data.labels.cfmd[lCode] },
+            { data: "active.t_count", title: config_data.labels.actv[lCode] },
+            { data: "recovered.t_count", title: config_data.labels.rcvd[lCode] },
+            { data: "deceased.t_count", title: config_data.labels.decd[lCode] },
+            { data: "confirmed.perc", title: config_data.labels.cfmd[lCode] + ' (%)' }
         ],
         scrollY: "300px",
         scrollX: true,
@@ -256,64 +328,27 @@ function createTable(data, langCode) {
         info: false,
         fixedColumns: true,
         autoWidth: true,
+        "order": [[ 1, "desc" ]],
         "language": {
-
             "search": '',
             "searchPlaceholder": "Search",
 
         },
-        // "dom": 'lCfrtip',
-        // "order": [],
-        // "colVis": {
-        //     "buttonText": "Hiển thị",
-        //     "overlayFade": 0,
-        //     "align": "right"
-        // },
-        // "language": {
-        //     "lengthMenu": '_MENU_ bản ghi trên trang',
-        //     "search": '',
-        //     "searchPlaceholder": "search",
-        //     "paginate": {
-        //         "previous": '<i class="fa fa-angle-left"></i>',
-        //         "next": '<i class="fa fa-angle-right"></i>'
-        //     }
-        // }
     });
 }
 
-function createDailyChangesGraph(rows, columns, domId, options) {
-    google.charts.load('current', { packages: ['corechart', 'line'] });
-    google.charts.setOnLoadCallback(drawBasic);
-    function drawBasic() {
-        var data = new google.visualization.DataTable();
-        for (let i = 0; i < columns.length; i++) {
-            const column = columns[i];
-            data.addColumn(column);
-        }
-        data.addRows(rows);
-        var chart = new google.visualization.LineChart(document.getElementById(domId));
-        chart.draw(data, options);
-    }
-}
-
-function getLineChartOptions(type, max_val) {
-    let options = { "chartArea": { "backgroundColor": config_data['bg_colors'][type], "left": 50, "right": 20, "top": 50, "bottom": 50, "width": "90%", "height": "70%" }, "backgroundColor": { "fill": config_data['bg_colors'][type] }, "colors": [config_data['colors'][type]], "legend": { "position": "top", "alignment": "center", "maxLines": 1 }, "tooltip": { "isHtml": true }, "vAxis": { "gridlines": { "count": 0 }, "viewWindow": { "max": max_val, "min": 0 } }, "hAxis": { "gridlines": { "color": config_data['bg_colors'][type] }, "format": "d MMM" }, "pointSize": 2 };
-    return options;
-}
-
-function getLineChartColumns(type, langCode) {
-    let columns = [
-        {
-            type: 'date',
-            label: 'Date'
-        },
-        {
-            type: 'number',
-            label: config_data.labels[type]['eng']
-        },
-        { 'type': 'string', 'role': 'tooltip', 'p': { 'html': true } }
-    ]
-    return columns;
+function createFooter(){
+    let data = `<footer id="footer">
+                    <div id="source">
+                        <div>Data Source</div>
+                        <div onclick="onclicksource()"><img src="./images/cloud_api.png" height="27px"
+                                width="27px">api.covid19india.org</div>
+                    </div>
+                    <div id="contact-info">
+                        <div>Developed by Hemanth K J</div>
+                    </div>
+                </footer>`
+    $('#footerContainer').html(data);
 }
 
 function createDailyChangesDataForState(statecode, d) {
@@ -346,6 +381,70 @@ function createDailyChangesDataForState(statecode, d) {
         data[element.date]['t_active'] = overall['active'];
     }
     return data;
+};
+
+function createDailyChangesDataForDistrict(state, district, dDailyData) {
+    let d = dDailyData[state][district];
+    console.log(d)
+    let data = {};
+    let prev_data = {
+        confirmed: 0,
+        active: 0,
+        recovered: 0,
+        deceased: 0,
+    };
+    for (let i = 0; i < d.length; i++) {
+        const element = d[i];
+        data[element.date] = {
+            confirmed: element.confirmed - prev_data.confirmed,
+            t_confirmed: element.confirmed,
+            active: element.active - prev_data.active,
+            t_active: element.active,
+            recovered: element.recovered - prev_data.recovered,
+            t_recovered: element.recovered,
+            deceased: element.deceased - prev_data.deceased,
+            t_deceased: element.deceased
+        }
+        prev_data = element;
+    }
+    console.log(data);
+
+    return data;
+};
+
+function createDailyChangesGraph(rows, columns, domId, options) {
+    google.charts.load('current', { packages: ['corechart', 'line'] });
+    google.charts.setOnLoadCallback(drawBasic);
+    function drawBasic() {
+        var data = new google.visualization.DataTable();
+        for (let i = 0; i < columns.length; i++) {
+            const column = columns[i];
+            data.addColumn(column);
+        }
+        data.addRows(rows);
+        var chart = new google.visualization.LineChart(document.getElementById(domId));
+        chart.draw(data, options);
+    }
+}
+
+function getLineChartOptions(type, max_val, min_val) {
+    let options = { "chartArea": { "backgroundColor": config_data['bg_colors'][type], "left": 50, "right": 20, "top": 50, "bottom": 50, "width": "90%", "height": "70%" }, "backgroundColor": { "fill": config_data['bg_colors'][type] }, "colors": [config_data['colors'][type]], "legend": { "position": "top", "alignment": "center", "maxLines": 1 }, "tooltip": { "isHtml": true }, "vAxis": { "gridlines": { "count": 0 }, "viewWindow": { "max": max_val, "min": min_val } }, "hAxis": { "gridlines": { "color": config_data['bg_colors'][type] }, "format": "d MMM" }, "pointSize": 2 };
+    return options;
+}
+
+function getLineChartColumns(type, lCode) {
+    let columns = [
+        {
+            type: 'date',
+            label: 'Date'
+        },
+        {
+            type: 'number',
+            label: config_data.labels[type]['eng']
+        },
+        { 'type': 'string', 'role': 'tooltip', 'p': { 'html': true } }
+    ]
+    return columns;
 }
 
 function createCustomHTMLContent(v, d, t, n) {
@@ -397,13 +496,7 @@ function formatDate(date, f) {
     }
 }
 
-function onclicksource() {
-    window.open('https://api.covid19india.org/', '_blank')
-}
-
 function showActionsDropdown() {
-    console.log('350');
-
     var y = document.getElementById(`actions-content`);
     if (y.style.display == "block") {
         y.style.display = "none";
@@ -415,7 +508,7 @@ function showActionsDropdown() {
         body["click_listener"] = true;
         body.addEventListener('click', (e) => {
             let id = e.target["id"];
-            if (typeof (id) == 'string' && id.split('_')[0] != 'lng-drdn-label') {
+            if (typeof (id) == 'string' && id.split('_')[0] != 'ld-label') {
                 let x = document.getElementById(`actions-content`);
                 if (x) x.style.display = "none";
             }
@@ -423,125 +516,105 @@ function showActionsDropdown() {
     }
 };
 
-function onChangeLanguage(lngCode) {
-    if (selectedLanguageCode !== lngCode) {
-        selectedLanguageCode = lngCode;
+function onChangeLanguage(lCode) {
+    if (selectedLanguageCode !== lCode) {
+        selectedLanguageCode = lCode;
         district_wise_table.destroy();
-        plotEverything(selectedLanguageCode);
+        insertContentIntoPage(stats_data, states_daily, state_district_wise, selectedLanguageCode);
+    }
+};
+
+function onChangeDistrict(e) {
+    console.log(e.target['value']);
+    if (e.target['value'].toLowerCase() !== currentGraphLoc) {
+        $(`#g-date-filter #beginning`).removeClass('active-df');
+        $(`#g-date-filter #one_month`).removeClass('active-df');
+        $(`#g-date-filter #one_week`).removeClass('active-df');
+        $(`#g-date-filter #beginning`).addClass('active-df');
+        if (e.target['value'].toLowerCase() == 'all districts') {
+            currentGraphData = states_daily;
+            currentGraphLoc = e.target['value'].toLowerCase();
+            createSection3(currentGraphData, selectedLanguageCode);
+        } else {
+            let data = createDailyChangesDataForDistrict('Karnataka', e.target['value'], districtsDailyData['districtsDaily']);
+            currentGraphData = data;
+            currentGraphLoc = e.target['value'].toLowerCase();
+            createSection3(currentGraphData, selectedLanguageCode);
+        }
     }
 
-};
-
-var settings = {
-    "url": "https://api.covid19india.org/raw_data1.json",
-    "method": "GET",
-    "timeout": 0,
-};
-
-// $.ajax(settings).done(function (response) {
-//     // console.log(response);
-//     var stateData = filterForStatesData(response['raw_data'], 'ka');
-//     // console.log(stateData);
-//     var obj = {};
-//     for (let i = 0; i < stateData.length; i++) {
-//         const element = stateData[i];
-//         const keys = Object.keys(obj);
-//         if (!Object.keys(obj).includes(element.statepatientnumber)) {
-//             if (element.currentstatus.toLowerCase() == "recovered" || element.currentstatus.toLowerCase() == "deceased") {
-//                 obj[element.statepatientnumber] = {
-//                     status: element.currentstatus,
-//                     dateannounced: element.dateannounced,
-//                     statuschangedate: element.statuschangedate
-//                 }
-//             } else {
-//                 obj[element.statepatientnumber] = {
-//                     status: element.currentstatus,
-//                     dateannounced: element.dateannounced,
-//                     statuschangedate: null
-//                 }
-//             }
-
-//         } else {
-//             if (obj[element.statepatientnumber].status != element.currentstatus) {
-//                 obj[element.statepatientnumber].statuschangedate = element.dateannounced;
-//             }
-//         }
-//     }
-//     // console.log(JSON.stringify(obj));
-
-//     // fs.writeFileSync('data.json', JSON.stringify(stateData));
-// });
-
-
-
-// $.ajax(total_numbers_info).done(function (response) {
-//     const x = response["statewise"].filter((x) => { return x['statecode'].toLowerCase() == 'ka' })[0];
-//     // console.log(x);
-//     const y = new stateInfo(x.confirmed, x.deltaconfirmed, x.active, x.deltaconfirmed - x.deltarecovered, x.recovered, x.deltarecovered, x.deaths, x.deltadeaths);
-//     console.log(y);
-//     $('#confirmed .content .t_count').text(y.confirmed.t_count);
-//     $('#confirmed .content .i_count').text(`[+${ y.confirmed.i_count }]`);
-//     $('#active .content .t_count').text(y.active.t_count);
-//     if(Math.sign(y.active.i_count) == -1) $('#active .content .i_count').text(`[-${ Math.abs(y.active.i_count) }]`);
-//     else $('#active .content .i_count').text(`[+${ y.active.i_count }]`);
-//     $('#active .header .perc').text(`${ Math.round(y.active.perc) }% `);
-//     $('#active .content .perc2').text(`(${ Math.round(y.active.perc) } %)`);
-//     $('#recovered .content .t_count').text(y.recovered.t_count);
-//     $('#recovered .content .i_count').text(`[+${ y.recovered.i_count }]`);
-//     $('#recovered .header .perc').text(`${ Math.round(y.recovered.perc) }% `);
-//     $('#recovered .content .perc2').text(`(${ Math.round(y.recovered.perc) } %)`);
-//     $('#deceased .content .t_count').text(y.deceased.t_count);
-//     $('#deceased .content .i_count').text(`[+${ y.deceased.i_count }]`);
-//     $('#deceased .header .perc').text(`${ Math.round(y.deceased.perc) }% `);
-//     $('#deceased .content .perc2').text(`(${ Math.round(y.deceased.perc) } %)`);
-// });
-
-
-var filterForStatesData = function (data, statecode) {
-    // return data.map((x) => {
-    //     if (x['statecode'].toLowerCase() == statecode.toLowerCase()) {
-    //         return structureTheData(x);
-    //     }
-    // }).filter((x) => { return x });
-    return data.filter((x) => { return x['statecode'].toLowerCase() == statecode.toLowerCase() });
 }
 
-var Patient = function (p_num, age, gender, district, status, h_date, r_date, state, notes) {
-    this.number = p_num;
-    this.age = age;
-    this.gender = gender;
-    this.status = status;
-    this.hospitalizedDate = h_date;
-    this.recoveredDate = r_date;
-    this.district = district;
-    this.state = state;
-    this.notes = notes;
+function onClickGDateFilter(val) {
+    $(`#g-date-filter #beginning`).removeClass('active-df');
+    $(`#g-date-filter #one_month`).removeClass('active-df');
+    $(`#g-date-filter #one_week`).removeClass('active-df');
+    $(`#g-date-filter #${val}`).addClass('active-df');
+    createSection3(applyDateFilter(currentGraphData, val), selectedLanguageCode)
 }
 
-var State = function (c, dc, a, da, r, dr, d, dd) {
+function applyDateFilter(y, f) {
+    let filteredData = {};
+    const dates = Object.keys(y).sort((a, b) => { new Date(a) - new Date(b) });
+    let dateRange = { min: dates[0], max: dates[dates.length - 1] };
+    switch (f) {
+        case 'one_month':
+            dateRange.min = new Date(dates[dates.length - 1]).setMonth(new Date(dates[dates.length - 1]).getMonth() - 1);
+            break;
+        case 'one_week':
+            dateRange.min = new Date(dates[dates.length - 1]).setDate(new Date(dates[dates.length - 1]).getDate() - 7);
+            break;
+        case 'beginning':
+            return y;
+        default:
+            return y;
+    }
+    for (let i = 0; i < dates.length; i++) {
+        let date = dates[i];
+        if ((new Date(date) >= dateRange.min)) {
+            filteredData[date] = y[date];
+        }
+    }
+    return filteredData;
+}
+
+function onclicksource() {
+    window.open('https://api.covid19india.org/', '_blank')
+}
+
+function onclickContactInfo(a) {
+    var y = document.getElementById(`developer-info`);
+    if (y.style.display == "block") {
+        y.style.display = "none";
+    } else {
+        y.style.display = "block";
+    }
+}
+
+var State = function (d) {
     this.confirmed = {
-        t_count: c,
-        i_count: dc
+        t_count: d.confirmed,
+        i_count: d.deltaconfirmed
     };
     this.active = {
-        t_count: a,
-        i_count: da,
-        perc: ((a / c) * 100).toFixed(2)
+        t_count: d.active,
+        i_count: d.deltaconfirmed - d.deltarecovered - d.deltadeaths,
+        perc: ((d.active / d.confirmed) * 100)
     };
     this.recovered = {
-        t_count: r,
-        i_count: dr,
-        perc: ((r / c) * 100).toFixed(2)
+        t_count: d.recovered,
+        i_count: d.deltarecovered,
+        perc: ((d.recovered / d.confirmed) * 100)
     };
     this.deceased = {
-        t_count: d,
-        i_count: dd,
-        perc: ((d / c) * 100).toFixed(2)
+        t_count: d.deaths,
+        i_count: d.deltadeaths,
+        perc: ((d.deaths / d.confirmed) * 100)
     }
 }
 
-var District = function (sd, dd, langCode) {
-    this.district = config_data.labels[dd.district.toLowerCase()][langCode];
+var District = function (sd, dd, lCode) {
+    this.district = config_data.labels[dd.district.toLowerCase()] ? config_data.labels[dd.district.toLowerCase()][lCode] : dd.district;
     this.confirmed = {
         t_count: dd.confirmed,
         i_count: dd.delta.confirmed,

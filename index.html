@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Covid 19 - Karnataka Information</title>
+    <title></title>
     <link rel="icon" href="./images/corona_icon_2.webp">
     <link rel="stylesheet" href="stylesheets/jquery.dataTables.min.css">
     <link rel="stylesheet" href="stylesheets/fixedColumns.dataTables.min.css">
@@ -16,21 +16,16 @@
     <script type="text/javascript" src="javascripts/jquery.dataTables.min.js"></script>
     <script src='javascripts/dataTables.fixedColumns.min.js'></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript" src="javascripts/data.js"></script>
+    <!-- <script type="text/javascript" src="javascripts/data.js"></script> -->
     <script type="text/javascript" src="javascripts/script.js"></script>
 </head>
 
 
 <body id="body">
-    <div id="app-header">
-        <span id="title">
-            Covid-19 Karnataka
-        </span>
-        <span class="language-dropdown">
-            <span id="lng-drdn-label" class="fa fa-language" onclick="showActionsDropdown()">
-                <!-- <span ></span> -->
-                <!-- <span class="fa fa-angle-down"></span> -->
-            </span>
+    <div id="navbar">
+        <span id="n-title"></span>
+        <span id="screen-l-d">
+            <span id="ld-label" onclick="showActionsDropdown()"></span>
             <div id="actions-content" class="dropdown-content">
                 <div class="dc-item" onclick="onChangeLanguage('kan')">
                     ಕನ್ನಡ
@@ -42,84 +37,30 @@
         </span>
     </div>
     <div id="main-content">
-        <div id="total-numbers-info">
-            <div id="confirmed">
-                <div class="header">
-                    <span class="title"></span>
-                </div>
-                <div class="content">
-                    <span class="t_count"></span>
-                    <span class="i_count"></span>
-                </div>
-            </div>
-            <div id="active">
-                <div class="header">
-                    <span class="title"></span>
-                    <span class="perc"></span>
-                </div>
-                <div class="content">
-                    <span class="t_count"></span>
-                    <span class="perc2"></span>
-                    <span class="i_count"></span>
-                </div>
-            </div>
-            <div id="recovered">
-                <div class="header">
-                    <span class="title"></span>
-                    <span class="perc"></span>
-                </div>
-                <div class="content">
-                    <span class="t_count"></span>
-                    <span class="perc2"></span>
-                    <span class="i_count"></span>
-                </div>
-            </div>
-            <div id="deceased">
-                <div class="header">
-                    <span class="title"></span>
-                    <span class="perc"></span>
-                </div>
-                <div class="content">
-                    <span class="t_count"></span>
-                    <span class="perc2"></span>
-                    <span class="i_count"></span>
-                </div>
+        <div id="section-1"></div>
+        <div id="section-2"></div>
+        <div id="graphFilters"></div>
+        <div id="section-3">
+            <div id="graphsContainer">
+                <div id="dcg-confirmed"></div>
+                <div id="dcg-active"></div>
+                <div id="dcg-recovered"></div>
+                <div id="dcg-deceased"></div>
             </div>
         </div>
-        <div id="perc-info">
-            <div id="perc-info-0">
+        <div id="section-4">
+            <div id="s4-header"></div>
+            <div id="dataTableContainer">
+                <table id="dw-table-info" class="stripe" style="width:100%"></table>
             </div>
-            <div id="perc-info-1">
-            </div>
-            <div id="perc-info-2">
-            </div>
-        </div>
-        <div>
-            <!-- <div id="graph-title" style="width: calc(100% - 10px);background-color: rgb(255, 230, 235);color: #ff083b;padding: 10px 0 0 10px;">
-                Confirmed
-            </div> -->
-            <div id="header" style="font-size:16px;font-weight:600;text-align:center;margin-bottom:10px"> Spread Trends</div>
-            <div id="dcg-confirmed"></div>
-        </div>
-        <div id="dcg-active"></div>
-        <div id="dcg-recovered"></div>
-        <div id="dcg-deceased"></div>
-        <div id="dw-table">
-            <table id="dw-table-info" class="stripe" style="width:100%"></table>
         </div>
     </div>
-    <footer id="footer" style="padding: 15px 0 15px 0;">
-        <div id="source">
-            <div>Source</div>
-            <div onclick="onclicksource()"><img src="./images/cloud_api.png" height="27px"
-                    width="27px">api.covid19india.org</div>
-        </div>
-        <div id="contact-info">
-            <div>Contact</div>
-            <div><span class="fa fa-envelope" style="margin-right: 15px;"></span>hemanthkj01@gmail.com</div>
-            <div><span class="fa fa-phone" style="margin-right: 15px;"></span>+91 8618911629</div>
-        </div>
-    </footer>
+    <div id="footerContainer"></div>
+    <!-- <div id="developer-info">
+        <div>Contact</div>
+        <div><span class="fa fa-envelope" style="margin-right: 15px;"></span>hemanthkj01@gmail.com</div>
+        <div><span class="fa fa-phone" style="margin-right: 15px;"></span>+91 8618911629</div>
+    </div> -->
 </body>
 
 
