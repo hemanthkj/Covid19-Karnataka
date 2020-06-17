@@ -7,8 +7,9 @@ body {
 /* Nav Bar (starts) */
 #navbar {
     text-align: center;
-    padding: 5px 0 5px 0;
+    padding: 10px 0 5px 0;
     color: #212121;
+    border-bottom: 1px solid gray;
 }
 
 #n-title {
@@ -338,6 +339,14 @@ body {
     border-right: 1px solid #ccc;
 }
 
+#g-date-filter span:nth-child(1) {
+    border-right: 1px solid #ccc;
+}
+
+#g-date-filter span:nth-child(2) {
+    border-right: 1px solid #ccc;
+}
+
 .active-df {
     background-color: #55f776;
     color: #212121;
@@ -399,7 +408,7 @@ tbody td:first-child {
 #footer {
     background-color: #212121;
     font-weight: 600;
-    padding: 10px 0 5px 0;
+    padding: 10px 0 10px 0;
 }
 
 #footer #source {
@@ -415,7 +424,7 @@ tbody td:first-child {
     margin-top: 10px;
     color: #dcdcdc;
     display: flow-root;
-    padding: 0 10px 0 0;
+    padding: 0 15px 0 0;
 }
 
 #footer #contact-info div:nth-child(1){
