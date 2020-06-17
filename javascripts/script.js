@@ -102,6 +102,18 @@ var districts_daily_api = {
     "timeout": 0,
 };
 
+window.onscroll = function () { onScrollFunction() };
+
+function onScrollFunction() {
+    var section1 = document.getElementById("section-1");
+    var sticky = section1.offsetTop;
+    if (window.pageYOffset > sticky) {
+        section1.classList.add("sticky");
+    } else {
+        section1.classList.remove("sticky");
+    }
+}
+
 // var stats_data = stats_data;
 // var state_district_wise = state_district_wise;
 // var states_daily = states_daily;
@@ -328,7 +340,7 @@ function createSection4(statsData, sDistrictWise, lCode) {
         info: false,
         fixedColumns: true,
         autoWidth: true,
-        "order": [[ 1, "desc" ]],
+        "order": [[1, "desc"]],
         "language": {
             "search": '',
             "searchPlaceholder": "Search",
@@ -337,7 +349,7 @@ function createSection4(statsData, sDistrictWise, lCode) {
     });
 }
 
-function createFooter(){
+function createFooter() {
     let data = `<footer id="footer">
                     <div id="source">
                         <div>Data Source</div>
