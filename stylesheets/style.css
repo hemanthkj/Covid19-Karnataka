@@ -347,7 +347,6 @@ body {
 #g-date-filter span {
     padding: 5px;
     cursor: pointer;
-    border-right: 1px solid #ccc;
 }
 
 #g-date-filter span:nth-child(1) {
