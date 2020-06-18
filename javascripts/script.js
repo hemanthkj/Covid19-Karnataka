@@ -79,7 +79,7 @@ var config_data = {
     }
 
 };
-var selectedLanguageCode = 'kan';
+var selectedLanguageCode = 'eng';
 var data_api = {
     "url": "https://api.covid19india.org/data.json",
     "method": "GET",
