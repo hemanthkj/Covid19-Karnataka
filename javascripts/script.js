@@ -79,6 +79,7 @@ var config_data = {
     }
 
 };
+var districtsNames = ["Bagalkote", "Ballari", "Belagavi", "Bengaluru", "Bengaluru Rural", "Bidar", "Chikkaballapura", "Dakshina Kannada", "Davanagere", "Dharwad", "Gadag", "Kalaburagi", "Kodagu", "Mandya", "Mysuru", "Tumakuru", "Udupi", "Uttara Kannada", "Vijayapura", "Chitradurga", "Bengaluru Urban", "Haveri", "Shivamogga", "Hassan", "Kolar", "Yadgir", "Chamarajanagara", "Chikkamagaluru", "Koppal", "Raichur", "Ramanagara"]
 var selectedLanguageCode = 'eng';
 var data_api = {
     "url": "https://api.covid19india.org/data.json",
@@ -97,7 +98,7 @@ var states_daily_api = {
 };
 
 var districts_daily_api = {
-    "url": "https://api.covid19india.org/districts_daily.json",
+    "url": "https://api.covid19india.org/v4/data-all.json",
     "method": "GET",
     "timeout": 0,
 };
@@ -114,10 +115,6 @@ function onScrollFunction() {
     }
 }
 
-// var stats_data = stats_data;
-// var state_district_wise = state_district_wise;
-// var states_daily = states_daily;
-// var districtsDaily = createDailyChangesDataForDistrict('Karnataka', 'Mandya', districtsDailyData['districtsDaily'])
 var district_wise_table;
 var currentGraphData;
 var currentGraphLoc;
@@ -133,19 +130,22 @@ $(document).ready(function () {
         $.ajax(states_daily_api).done(function (r2) {
             states_daily = createDailyChangesDataForState('ka', r2['states_daily']);
             $.ajax(districts_daily_api).done(function (r3) {
-                // districtsDailyData = createDailyChangesDataForDistrict('Karnataka', 'Mandya', districtsDailyData['districtsDaily'])
-                districtsDailyData = r3;
+                let kaData = {};
+                let allDates = Object.keys(r3)
+                for (let i = 0; i < allDates.length; i++) {
+                    let allStateCodes = Object.keys(r3[allDates[i]]);
+                    if (allStateCodes.includes("KA")) {
+                        kaData[allDates[i]] = r3[allDates[i]]["KA"]
+                    }
+                }
+                districtsDailyData = kaData;
                 $.ajax(state_district_wise_api).done(function (r4) {
                     state_district_wise = r4.filter((x) => { return x['statecode'].toLowerCase() == 'ka' })[0];
-                    // let d_y = state_district_wise['districtData'].map((a) => { return new District(stats_data, a, selectedLanguageCode) });
                     insertContentIntoPage(stats_data, states_daily, state_district_wise, selectedLanguageCode);
                 });
             });
         });
     });
-    // let d_y = state_district_wise['districtData'].map((a) => { return new District(stats_data, a, selectedLanguageCode) });
-    // insertContentIntoPage(stats_data, states_daily, state_district_wise, selectedLanguageCode);
-    // createDailyChangesDataForDistrict('Karnataka', 'Mandya', districtsDailyData['districtsDaily'])
 })
 
 
@@ -157,7 +157,7 @@ function insertContentIntoPage(stats, sDaily, sDistrictWise, lCode) {
     createSection2(stats, sDaily, lCode);
     currentGraphData = sDaily;
     currentGraphLoc = 'all districts';
-    createGraphFilters(Object.keys(districtsDailyData['districtsDaily']['Karnataka']))
+    createGraphFilters(districtsNames)
     createSection3(sDaily, lCode);
     createSection4(stats, sDistrictWise, lCode);
     createFooter();
@@ -208,10 +208,6 @@ function createSection2(stats, sDaily, lCode) {
     let sevenDayBefore = new Date().setDate(new Date().getDate() - 7);
     let sdbd = sDaily[formatDate(sevenDayBefore, 'dd-mmm-yy')]; // Seven Day Before Data
     let sdbp = formatDate(today, 'dd mmm yyyy') + ' - ' + formatDate(sevenDayBefore, 'dd mmm yyyy'); // Seven Day Before Period
-    // console.log(sdbd);
-    console.log(stats.recovered.perc)
-    console.log(Math.round(stats.recovered.perc));
-
     let avg_growth_rate = (((stats.confirmed.t_count - sdbd.t_confirmed) / sdbd.t_confirmed) * 100) / 7;
     var perc_info_1 = `<div id="active-rate">
                             <div>${config_data.perc_info.actv_rate.title[lCode]}</div>
@@ -320,9 +316,7 @@ function createSection3(sDaily, lCode) {
 
 function createSection4(statsData, sDistrictWise, lCode) {
     $('#s4-header').text(config_data.labels['district-wise details'][lCode]);
-    console.log(sDistrictWise)
     let data = sDistrictWise['districtData'].map((a) => { return new District(statsData, a, lCode) }).sort((a, b) => { return a.confirmed['t_count'] - b.confirmed['t_count'] });
-    console.log(data)
     district_wise_table = $('#dw-table-info').DataTable({
         data: data,
         columns: [
@@ -395,9 +389,8 @@ function createDailyChangesDataForState(statecode, d) {
     return data;
 };
 
-function createDailyChangesDataForDistrict(state, district, dDailyData) {
+function createDailyChangesDataForDistrictOld(state, district, dDailyData) {
     let d = dDailyData[state][district];
-    console.log(d)
     let data = {};
     let prev_data = {
         confirmed: 0,
@@ -419,8 +412,32 @@ function createDailyChangesDataForDistrict(state, district, dDailyData) {
         }
         prev_data = element;
     }
-    console.log(data);
+    return data;
+};
 
+function createDailyChangesDataForDistrict(district, dDailyData) {
+    let data = {};
+    let allDates = Object.keys(dDailyData)
+    for (let i = 0; i < allDates.length; i++) {
+        const date = allDates[i];
+        const element = dDailyData[date]
+        if(element.districts && (Object.keys(element.districts).map((x)=> {return x.toLowerCase()})).includes(district.toLowerCase())){
+            let diArr = Object.keys(element.districts)
+            let d = element.districts[diArr[diArr.map((x)=>{return x.toLowerCase()}).indexOf(district.toLowerCase())]];
+            data[date] = {
+                confirmed: d.delta && d.delta.confirmed ? d.delta.confirmed : 0,
+                t_confirmed: d.total && d.total.confirmed ? d.total.confirmed : 0,
+                active: 0,
+                t_active: 0,
+                recovered: d.delta && d.delta.recovered ? d.delta.recovered : 0,
+                t_recovered: d.total && d.total.recovered ? d.total.recovered : 0,
+                deceased: d.delta && d.delta.deceased ? d.delta.deceased : 0,
+                t_deceased: d.total && d.total.deceased ? d.total.deceased : 0,
+            }
+            data[date]["active"] = data[date]['confirmed'] - data[date]['recovered']- data[date]['deceased']
+            data[date]["t_active"] = data[date]['t_confirmed'] - data[date]['t_recovered']- data[date]['t_deceased']
+        }
+    }
     return data;
 };
 
@@ -537,7 +554,6 @@ function onChangeLanguage(lCode) {
 };
 
 function onChangeDistrict(e) {
-    console.log(e.target['value']);
     if (e.target['value'].toLowerCase() !== currentGraphLoc) {
         $(`#g-date-filter #beginning`).removeClass('active-df');
         $(`#g-date-filter #one_month`).removeClass('active-df');
@@ -548,7 +564,7 @@ function onChangeDistrict(e) {
             currentGraphLoc = e.target['value'].toLowerCase();
             createSection3(currentGraphData, selectedLanguageCode);
         } else {
-            let data = createDailyChangesDataForDistrict('Karnataka', e.target['value'], districtsDailyData['districtsDaily']);
+            let data = createDailyChangesDataForDistrict(e.target['value'], districtsDailyData);
             currentGraphData = data;
             currentGraphLoc = e.target['value'].toLowerCase();
             createSection3(currentGraphData, selectedLanguageCode);
